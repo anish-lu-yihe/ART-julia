@@ -31,6 +31,17 @@ total_vec = [art.F2[i].n_categories for i = 1:art.n_categories]
 # ╔═╡ 4155b9d2-0477-4450-8d32-590eb231367c
 total_cat = sum(total_vec)
 
+# ╔═╡ e3238b6b-d74c-4fb7-bf6a-52a74103a82b
+y_true = zeros(Int, size(labels))
+
+# ╔═╡ ddb17c28-4e77-4fc7-bd53-d0ec0643842d
+for (i, l) in enumerate(("Iris-setosa", "Iris-versicolor", "Iris-virginica"))
+	y_true[labels.==l] .= i
+end
+
+# ╔═╡ 8fe0fb91-76a4-497e-a4ca-287104622c93
+performance(y_hat_train, y_true)
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -447,5 +458,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═b29357bc-68c4-479b-afe1-8e1951179d92
 # ╠═1f7a97a6-60df-4b28-9f7c-be9000d6f55d
 # ╠═4155b9d2-0477-4450-8d32-590eb231367c
+# ╠═e3238b6b-d74c-4fb7-bf6a-52a74103a82b
+# ╠═ddb17c28-4e77-4fc7-bd53-d0ec0643842d
+# ╠═8fe0fb91-76a4-497e-a4ca-287104622c93
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
