@@ -25,8 +25,8 @@ rng = MersenneTwister(1234)
 
 # ╔═╡ e5f58a26-cbba-4b6b-be7c-1f22838ee9df
 begin
-	dist1 = MvNormal([0.0, 6.0], [1.0 0.0; 0.0 1.0])
-	dist2 = MvNormal([4.5, 6.0], [2.0 -1.5; -1.5 2.0])
+	dist1 = MvNormal([0.0, 6.0], [0.1 0.0; 0.0 0.1])
+	dist2 = MvNormal([5.0, 6.0], [0.2 -0.1; -0.1 0.2])
 end
 
 # ╔═╡ 207f8fa5-7cc1-490f-a4a1-a9bc77bf9ab6
@@ -39,7 +39,7 @@ begin
 end
 
 # ╔═╡ b37abf16-8a27-4aca-9360-c41db6b0aee1
-p1 = scatter(X[1,:], X[2,:], group=y, title="Original Data")
+p0 = scatter(X[1,:], X[2,:], group=y, title="Original Data")
 
 # ╔═╡ b26ac53c-d7e8-4f1a-8efa-e1113b91f31d
 (X_train_raw, y_train_raw), (X_test_raw, y_test_raw) = stratifiedobs((X, y))
@@ -53,48 +53,27 @@ begin
 	y_test = convert(Vector{Int}, y_test_raw)
 end
 
-# ╔═╡ 6a952fd6-580f-4567-a74d-8efe779c2ea0
-# Unsupervised DDVFA
-begin
-	art1 = DDVFA()
-	train!(art1, X_train)
-	y1_hat_test = AdaptiveResonance.classify(art1, X_test)
-	p2 = scatter(X_test[1,:], X_test[2,:], group=y1_hat_test, title="Unsupervised DDVFA")
-end
+# ╔═╡ afc25da0-2a0d-4363-ae34-1a8cce3d7aa5
+y_hat_data = []
 
-# ╔═╡ 1af7308d-8b23-4439-b6ac-c75b9d11cd15
-# Supervised DDVFA
-begin
-	art2 = DDVFA()
-	train!(art2, X_train, y=y_train)
-	y2_hat_test = AdaptiveResonance.classify(art2, X_test)
-	p3 = scatter(X_test[1,:], X_test[2,:], group=y2_hat_test, title="Supervised DDVFA", xlabel="Performance: " * string(round(performance(y2_hat_test, y_test); digits=3)))
-end
-
-# ╔═╡ 5ed3103c-49b0-4cac-8e9b-737326e1333f
-# Supervised SFAM
-begin
-	art3 = SFAM()
-	train!(art3, X_train, y_train)
-	y3_hat_test = AdaptiveResonance.classify(art3, X_test)
-	p4 = scatter(X_test[1,:], X_test[2,:], group=y3_hat_test, title="Supervised SFAM", xlabel="Performance: " * string(round(performance(y3_hat_test, y_test); digits=3)))
-end
-
-# ╔═╡ 11ea9321-9ddf-44af-935d-b9b07c21699d
-# Performance Measure + display the plots
-plot(p1, p2, p3, p4, layout=(1, 4), legend = false, xtickfontsize=6, xguidefontsize=8, titlefont=font(8))
+# ╔═╡ 076d84f3-9269-4097-ac2a-048d83fe5df2
+size(y_hat_data)
 
 # ╔═╡ 78217fe2-b6f1-48cc-a0d9-fafc965e3995
 # Unsupervised FuzzyART
-begin
-	art4 = FuzzyART()
-	train!(art4, X_train)
-	y4_hat_test = AdaptiveResonance.classify(art4, X_test)
-	p5 = scatter(X_test[1,:], X_test[2,:], group=y1_hat_test, title="Unsupervised FuzzyART")
+for iter_rho in range(0, 1, step = .25)
+	art = FuzzyART(rho = iter_rho)
+	train!(art, X_train)
+	y_hat_test = AdaptiveResonance.classify(art, X_test)
+	append!(y_hat_data, [y_hat_test])
 end
 
-# ╔═╡ 009a6e5c-906f-45fe-a1da-baeaea156f1b
-art4
+
+# ╔═╡ 1f82346f-e069-4b76-9324-87b83bc22fa3
+p1 = scatter(X_test[1,:], X_test[2,:], group=y_hat_data[1], title="Unsupervised FuzzyART")
+
+# ╔═╡ 14b3cd4e-d001-4385-8e09-c7c9eacf6f3f
+p2 = scatter(X_test[1,:], X_test[2,:], group=y_hat_data[2], title="Unsupervised FuzzyART")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1150,12 +1129,11 @@ version = "0.9.1+5"
 # ╠═51494396-7296-45d3-80b0-e46b75ca7ed0
 # ╠═b37abf16-8a27-4aca-9360-c41db6b0aee1
 # ╠═b26ac53c-d7e8-4f1a-8efa-e1113b91f31d
-# ╠═7e212686-d4ee-4356-adfa-04d382acc737
-# ╠═6a952fd6-580f-4567-a74d-8efe779c2ea0
-# ╠═1af7308d-8b23-4439-b6ac-c75b9d11cd15
-# ╠═5ed3103c-49b0-4cac-8e9b-737326e1333f
-# ╠═11ea9321-9ddf-44af-935d-b9b07c21699d
+# ╟─7e212686-d4ee-4356-adfa-04d382acc737
+# ╠═afc25da0-2a0d-4363-ae34-1a8cce3d7aa5
+# ╠═076d84f3-9269-4097-ac2a-048d83fe5df2
 # ╠═78217fe2-b6f1-48cc-a0d9-fafc965e3995
-# ╠═009a6e5c-906f-45fe-a1da-baeaea156f1b
+# ╠═1f82346f-e069-4b76-9324-87b83bc22fa3
+# ╠═14b3cd4e-d001-4385-8e09-c7c9eacf6f3f
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
